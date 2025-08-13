@@ -1,10 +1,14 @@
-import Image from "next/image";
+import LandingPage from "@/components/LandingPage";
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <div>
-      {/* Add your content here */}
-      <h1 className='font-bold text-5xl text-center'>Welcome to Calendra App</h1>
-    </div>
-  );
+export default async function HomePage() {
+
+  const user = await currentUser();
+
+  // If no user is logged in, render the public landing page
+  if (!user) return <LandingPage />;
+
+  // If user is logged in, redirect to the events page
+  return redirect('/events');
 }

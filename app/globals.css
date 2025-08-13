@@ -15,7 +15,7 @@
 /* A custom theme block, possibly processed by a tool like PostCSS or a design system */
 @theme {
   /* Define a custom CSS variable that uses a keyframe animation */
-  --animation-fade-in: fade-in-scale 0.3s ease-out;
+  --animate-fade-in: fade-in-scale 0.3s ease-out;
 
   /* Define the keyframes for the "fade-in-scale" animation */
   @keyframes fade-in-scale {
