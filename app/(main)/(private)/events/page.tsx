@@ -8,6 +8,17 @@ export default function Page() {
             {/* Page title and "New Event" button */}
             <div className="flex gap-4 itmes-baseline">
                 <h1 className="text-4xl xl:text-5xl font-black mb-6">Events</h1>
+                {/* 
+                Without `asChild`, the Button would render as:
+                <button><a href="/dashboard">Go to Dashboard</a></button> <!-- Invalid HTML! -->
+
+                With `asChild`, the Button will render as:
+                <a href="/dashboard" class="button styles...">Go to Dashboard</a> <!-- Valid HTML!
+
+                This is useful when you want to make another elemtent (like a <Link>) look and behave
+                like a button without breaking HTML semantics.
+
+                */}
                 <Button className="bg-blue-500 hover:bg-blue-400 text-white py-6 hover:scale-110 duration-500 border-b-4
                     border-blue-700 hover:border-blue-500 rounded-2xl shadow-accent-foreground text-2xl font-black" 
                     asChild>
