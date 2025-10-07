@@ -13,7 +13,7 @@ import { useTransition } from "react"
 import { Button } from "../ui/button"
 import { is } from "drizzle-orm"
 import Link from "next/link"
-import { createEvent, updateEvent } from "@/server/actions/events"
+import { createEvent, deleteEvent, updateEvent } from "@/server/actions/events"
 
 
 // Component to handle creating/editing/deleting an event
