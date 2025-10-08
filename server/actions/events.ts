@@ -1,4 +1,4 @@
-'use server'
+'use server'  // Marks this file as a Server Action - required for Next.js App Router
 import { db } from "@/drizzle/db";
 import { EventTable } from "@/drizzle/schema";
 import { eventFormSchema } from "@/schema/events"
@@ -7,8 +7,6 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-
- // Marks this file as a Server Action - required for Next.js App Router
 
 // This fuction creates a new event in the database after validating the input data
 export async function createEvent(

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 import Link from "next/link";
 
 export default function Page() {
@@ -23,7 +23,7 @@ export default function Page() {
                     border-blue-700 hover:border-blue-500 rounded-2xl shadow-accent-foreground text-2xl font-black" 
                     asChild>
                         <Link href="/events/new">
-                        <Calendar className="mr-4 size-7" />
+                        <CalendarPlus className="mr-4 size-7" />
                             Create Event
                         </Link>
                 </Button>
