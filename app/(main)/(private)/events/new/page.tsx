@@ -5,6 +5,7 @@
    and responsive, ensuring a clean and focused user interface for event creation.
 */
 
+import EventForm from "@/components/forms/EventForm";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 
@@ -25,10 +26,11 @@ export default function NewEventPage() {
             {/* Optional content placeholder, currently commented out */}
             {/* <p>Card Content</p> */}
         </CardContent>
-        <CardFooter>
+        {/* <CardFooter> */}
             {/* Optional footer placeholder, currently commented out */}
+            <EventForm />
             {/* <p>Card Footer</p> */}
-        </CardFooter>
+        {/* </CardFooter> */}
         </Card>         
     )
 }

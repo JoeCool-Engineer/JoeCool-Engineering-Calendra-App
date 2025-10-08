@@ -1,8 +1,8 @@
 'use client' // Marks this file to be processed on the client side in Next.js
 
-import { Form, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "../ui/form"
+import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "../ui/form"
 import { Input } from "../ui/input"
 import { eventFormSchema } from "@/schema/events"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,7 +11,6 @@ import { Switch } from "../ui/switch"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog"
 import { useTransition } from "react"
 import { Button } from "../ui/button"
-import { is } from "drizzle-orm"
 import Link from "next/link"
 import { createEvent, deleteEvent, updateEvent } from "@/server/actions/events"
 
@@ -37,33 +36,28 @@ export default function EventForm({
     */
     const [isDeletePending, startDeleteTransition] = useTransition()
 
-    const form = useForm<z.infer<typeof eventFormSchema>>({
+    const form = useForm<z.input<typeof eventFormSchema>>({
         resolver: zodResolver(eventFormSchema), // Use Zod schema for form validation
         defaultValues: event 
         ? { 
-        // If `event` is provided (edit mode), spread its existing properties as default values
             ...event, 
         } 
         : { 
-            // If `event` is not provided (create mode), use the fallback default values
-            isActive: true,         // New events are active by default
-            durationInMinutes: 30,  // Default duration is 30 minutes
-            description: '',       // Ensure controlled input: default to empty string
-            name: '',              // Ensure controlled input: default to empty string
+            isActive: true,
+            durationInMinutes: 30,
+            description: '',
+            name: '',
         },
     })
 
     // Function to handle form submission
     async function onSubmit(values: z.infer<typeof eventFormSchema>) {
         const action = event == null ? createEvent : updateEvent.bind(null, event.id)
-        try {
-            await action(values) // Call the appropriate action (create or update)
-        } catch (error: any) {
-            // Handle errors during form submission
-            form.setError("root", {
-                message: `There was an error saving your event ${error.message}`,         
-            })
-        }
+
+        const data = await action(values) // Call the appropriate action (create or update)
+        if (data?.error) {
+            form.setError("root", { message: "There was an error saving your event. Please try again." })
+        }    
     }
 
     return (
@@ -224,7 +218,7 @@ export default function EventForm({
                 </Button>
                 </div>
             </form>
-            </Form>
+        </Form>
     )
  
 }

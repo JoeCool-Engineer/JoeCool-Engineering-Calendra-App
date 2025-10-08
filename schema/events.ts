@@ -3,8 +3,7 @@ import { z } from "zod"
 // Define a validation schema for the event form using Zod
 export const eventFormSchema = z.object({
     // 'name' must be a string and is required (at least 2 characters)
-    // Replace message with "Required" if message does not show up in the form, remove the curly braces 
-    name: z.string().min(2, { message: "Event name must be at least 2 characters." }),
+    name: z.string().min(2, "Required" ),
 
     // 'description' is an optional string field
     description: z.string().optional(),
