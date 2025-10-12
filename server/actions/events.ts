@@ -10,7 +10,7 @@ import { z } from "zod";
 
 // This fuction creates a new event in the database after validating the input data
 export async function createEvent(
-    unsafeData: z.infer<typeof eventFormSchema> // Accept raw event data validated by the zod schema
+    unsafeData: z.input<typeof eventFormSchema> // Accept raw event data (input) validated/coerced by the zod schema
 ): Promise<{ error: boolean } | undefined> {
 
         // Authenticate the user using Clerk's auth function
@@ -27,9 +27,6 @@ export async function createEvent(
 
         // Revalidate the '/events' path to ensure the page fetches fresh data  after the database operation
         revalidatePath('/events')
-        // Redirect the user to the '/events' page after the action completes (whether successful or not)
-        redirect('/events')
-
 
 }
 
@@ -37,7 +34,7 @@ export async function createEvent(
 // This function updates an existing event in the database after validating the input and checking ownership
 export async function updateEvent(
     id: string, // The ID of the event to update
-    unsafeData: z.infer<typeof eventFormSchema> // The new event data to update, validated by the zod schema
+    unsafeData: z.input<typeof eventFormSchema> // The new event data to update (input) validated/coerced by the zod schema
 ): Promise<void> {
     try {
 
@@ -68,8 +65,6 @@ export async function updateEvent(
     } finally {
         // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
         revalidatePath('/events')
-        // Redirect the user to the '/events' page after the action completes (whether successful or not)
-        redirect('/events')
     }
 }
 
@@ -101,8 +96,44 @@ export async function deleteEvent(
     } finally {
         // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
         revalidatePath('/events')
-        // Redirect the user to the '/events' page after the action completes (whether successful or not)
-        redirect('/events')
     }
 }
 
+// Infer the type of a row from the EventTable schema
+type EventRow = typeof EventTable.$inferSelect
+
+// Async function to fetch all events (active and inactive) for specific user
+export async function getEvents(clerkUserId: string): Promise<EventRow[]> {
+    // Query the database for events belonging to the specified user
+    const events = await db.query.EventTable.findMany({
+        // where: this defines a filter (a WHERE clause) for your query.
+
+        // ({ clerkUserId: userIdCol }, { eq }) => ... - This is a destructured function:
+
+        // clerkUserId is a variable (likely passed in earlier to the query).
+
+        // userIdCol is a reference to a column in your database (you're just renaming clerkUserId to userIdCol for clarity).
+        where: ({ clerkUserId: userIdCol }, { eq }) => eq(userIdCol, clerkUserId),
+
+        // Events are ordered alphatbetically (case-insensitive) by their title
+        orderBy: ({ name }, { asc, sql }) => asc(sql`lower(${name})`),
+    })
+    // Return the full list of events
+    return events
+}
+
+// Fetch a specific event for a given user
+export async function getEvent(userId: string, eventId: string):
+Promise<EventRow | undefined> {
+    try {
+        const event = await db.query.EventTable.findFirst({
+            where: ({ id, clerkUserId }, { and, eq }) => 
+                and(eq(clerkUserId, userId), eq(id, eventId)), // Make sure the event belongs to the user
+        })
+
+        return event ?? undefined
+    } catch (error: any) {
+        // Re-throw with context so runtime logs show the failing query parameters
+        throw new Error(`Failed to run getEvent for userId=${userId}, eventId=${eventId}: ${error.message || error}`)
+    }
+}

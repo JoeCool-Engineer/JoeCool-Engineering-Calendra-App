@@ -13,6 +13,7 @@ import { useTransition } from "react"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { createEvent, deleteEvent, updateEvent } from "@/server/actions/events"
+import { useRouter } from "next/navigation"
 
 
 // Component to handle creating/editing/deleting an event
@@ -36,6 +37,8 @@ export default function EventForm({
     */
     const [isDeletePending, startDeleteTransition] = useTransition()
 
+    const router = useRouter()
+
     const form = useForm<z.input<typeof eventFormSchema>>({
         resolver: zodResolver(eventFormSchema), // Use Zod schema for form validation
         defaultValues: event 
@@ -51,13 +54,22 @@ export default function EventForm({
     })
 
     // Function to handle form submission
-    async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    async function onSubmit(values: z.input<typeof eventFormSchema>) {
         const action = event == null ? createEvent : updateEvent.bind(null, event.id)
+        try {
+            const data = await action(values) // Call the appropriate action (create or update)
 
-        const data = await action(values) // Call the appropriate action (create or update)
-        if (data?.error) {
-            form.setError("root", { message: "There was an error saving your event. Please try again." })
-        }    
+            // Some actions (like createEvent) return an error object instead of throwing.
+            if (data?.error) {
+                form.setError("root", { message: "There was an error saving your event. Please try again." })
+                return
+            }
+
+            // Navigate to the events list page after successful submission
+            router.push('/events')
+        } catch (error: any) {
+            form.setError("root", { message: `There was an error saving your event: ${error.message}` })
+        }
     }
 
     return (
@@ -79,7 +91,7 @@ export default function EventForm({
                         <FormItem>
                             <FormLabel>Event Name</FormLabel>
                             <FormControl>
-                                <Input {...field} />
+                                <Input {...(field as any)} />
                             </FormControl>
                             <FormDescription>
                                 The name users will see when booking
@@ -97,7 +109,7 @@ export default function EventForm({
                         <FormItem>
                             <FormLabel>Duration (in minutes)</FormLabel>
                             <FormControl>
-                                <Input type="number" {...field} />
+                                <Input type="number" {...(field as any)} />
                             </FormControl>
                             <FormDescription>
                                 How long in minutes 
@@ -115,7 +127,7 @@ export default function EventForm({
                         <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                                <Textarea className="resize-none" h-32 {...field} />
+                                <Textarea className="resize-none" h-32 {...(field as any)} />
                             </FormControl>
                             <FormDescription>
                                 Optional description to the event
