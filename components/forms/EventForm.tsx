@@ -191,6 +191,7 @@ export default function EventForm({
                                         try {
                                             // Attempt to delete the event by its ID
                                             await deleteEvent(event.id)
+                                            router.push('/events')
                                         } catch (error: any) {
                                             // If an error occurs, set it as a root error in the form state
                                             form.setError("root", {
