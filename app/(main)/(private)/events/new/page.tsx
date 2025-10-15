@@ -12,7 +12,7 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 export default function NewEventPage() {
     return (
         // Container Card component centered of the page with a max width
-        <Card className='max-w-md mx-auto border-8 border-blue-200 shadow-2xl shadow-accent-foreground'>
+        <Card className='max-w-md p-4 mx-auto border-8 border-blue-200 shadow-2xl shadow-accent-foreground'>
         {/* Header section of the card displaying the title */}
         <CardHeader>
             <CardTitle>New Event</CardTitle>
