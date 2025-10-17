@@ -9,6 +9,12 @@ import z from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "../ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { formatTimezoneOffset } from "@/lib/formatters"
+import { Plus } from "lucide-react"
+import { Button } from "../ui/button"
+import { Fragment } from "react"
+import { Input } from "../ui/input"
+import { toast } from "sonner"
+import { saveSchedule } from "@/server/actions/schedule"
 
 // Define the Availability type
 type Availability = {
@@ -51,6 +57,21 @@ export function ScheduleForm({
         availabilityFields.map((field, index) => ({ ...field, index })),
         availability => availability.dayOfWeek
     )
+
+    async function onSubmit(values: z.infer<typeof scheduleFormSchema>) {
+        try {
+            await saveSchedule(values)
+            toast('Schedule saved successfully.',  {
+                duration: 5000,
+                className: '!round-3xl !py-8 !px-5 !justify-center !text-green-400 !font-black'
+            })
+        } catch (error: any) {
+            //Handle any unexpected errors that occur during the schedule saving process 
+            form.setError('root', {
+                message: `There was an error saving your schedule${error.message}`,
+            })
+        }
+    }
 
     return (
         <Form {...form}>
@@ -95,9 +116,99 @@ export function ScheduleForm({
                 </FormField>
 
                 {/* Availibility form grid grouped by day */}
-                
+                <div className= 'grid grid-cols-[auto_auto] gap-y-6'>
+                    {DAYS_OF_WEEK_IN_ORDER.map(dayOfWeek => (
+                        <Fragment key={dayOfWeek}>
+                            {/* Day label */}
+                            <div className='capitalize text-sm font-sem'>
+                                {dayOfWeek.substring(0, 3)}
+                            </div>
+
+                            {/* Add Availability for a specific day */}
+                            <div className='flex flex-col gap-2'>
+                                <Button 
+                                    type='button'
+                                    className='size-6 p-1 cursor-pointer '
+                                    variant='outline'
+                                    onClick={() => {
+                                        addAvailability({
+                                            dayOfWeek,
+                                            startTime: '9:00',
+                                            endTime: '17:00',
+                                        })
+                                    }}
+                                    >
+                                        <Plus color='red' />
+                                    </Button>
+
+                                    {/* Render availability entries for this date */}
+                                    {groupAvailabilityFields[dayOfWeek]?.map(
+                                        (field, LabelIndex) => (
+                                            <div className='flex flex-col gap-1' key={field.id}>
+                                                <div className='flex gap-2 item'>
+                                                {/* Start time input */}
+                                                <FormField 
+                                                    control={form.control}
+                                                    name={`availabilities.${field.index}.startTime`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormControl>
+                                                                <Input
+                                                                    className='w-24'
+                                                                    aria-label={`${dayOfWeek} Start Time ${
+                                                                        LabelIndex + 1
+                                                                    }`}
+                                                                    {...field}
+                                                                    />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+
+                                                {/* Remove availability */}
+                                                <Button
+                                                    type='button'
+                                                    className='size-6 p-1 cursor'
+                                                    variant='destructive'
+                                                    onclick={() => removeAvailability}
+                                                >
+                                                    <X />
+                                                </Button>
+                                                </div>
+
+                                            {/* Show field-level validation messages */}
+                                            <FormMessage>
+                                                {
+                                                    form.formState.errors.availabilities?.at?.(
+                                                        field.index
+                                                    )?.root?.message
+                                                }
+                                            </FormMessage>
+                                            <FormMessage>
+                                                {
+                                                    form.formState.errors.availabilities?.at?.(
+                                                        field.index
+                                                    )?.startTime?.message
+                                                }    
+                                            </FormMessage>   
+                                            </div>
+                                        )
+                                    )}
+                            </div>
+                        </Fragment>
+                    ))}
+                </div>
 
                 {/* Save button */}
+                <div className='flex gap-2 justify-start'>
+                    <Button
+                        className='cursor-pointer hover:scale-105 hover:bg-blue-600'
+                        disabled={form.formState.isSubmitting}
+                        type='submit'>
+                            Save
+                        </Button>
+                </div>
+
             </form>
         </Form>
     )

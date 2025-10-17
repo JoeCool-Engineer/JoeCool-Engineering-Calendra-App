@@ -6,6 +6,7 @@ page within a card layout, displaying a title and a `ScheduleForm` component pop
 view and possibly manage their schedule on the page.
 */
 
+import { ScheduleForm } from "@/components/forms/ScheduleForm"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { getSchedule } from "@/server/actions/schedule"
 import { auth } from "@clerk/nextjs/server"
@@ -25,7 +26,7 @@ export default async function SchedulePage() {
                 <CardTitle>Schedule</CardTitle> {/* Display title for the page */}
             </CardHeader>
             <CardContent>
-                {/* <ScheduleForm schedule={schedule} /> */}
+                <ScheduleForm schedule={schedule} />
             </CardContent>
         </Card>
     )
