@@ -9,7 +9,7 @@ import z from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "../ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { formatTimezoneOffset } from "@/lib/formatters"
-import { Plus } from "lucide-react"
+import { Plus, X } from "lucide-react"
 import { Button } from "../ui/button"
 import { Fragment } from "react"
 import { Input } from "../ui/input"
@@ -164,13 +164,32 @@ export function ScheduleForm({
                                                         </FormItem>
                                                     )}
                                                 />
+                                                -
+                                                {/* End time input */}
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`availabilities.${field.index}.endTime`}
+                                                    render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                        <Input
+                                                            className="w-24"
+                                                            aria-label={`${dayOfWeek} End Time ${
+                                                            LabelIndex + 1
+                                                            }`}
+                                                            {...field}
+                                                        />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                    )}
+                                                />
 
                                                 {/* Remove availability */}
                                                 <Button
                                                     type='button'
                                                     className='size-6 p-1 cursor'
                                                     variant='destructive'
-                                                    onclick={() => removeAvailability}
+                                                    onClick={() => removeAvailability(field.index)}
                                                 >
                                                     <X />
                                                 </Button>
