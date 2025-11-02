@@ -102,7 +102,6 @@ export async function getCalendarEventTimes(
         throw new Error(`Failed to fetch calendar events: ${err.message || err}`)
 
     }
-
 }
 
   export async function createCalendarEvent({
